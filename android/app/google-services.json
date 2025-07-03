@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "4877697752",
+    "project_id": "gymbro-d469f",
+    "storage_bucket": "gymbro-d469f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4877697752:android:b3b60fe0d4d6adaaabcdad",
+        "android_client_info": {
+          "package_name": "com.example.gymbro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpsh43Nq1wdYWQGqiIdZ_jJDAbhDvNtYc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
