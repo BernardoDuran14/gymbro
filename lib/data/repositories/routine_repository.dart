@@ -13,8 +13,8 @@ class RoutineRepository {
   static const columnRoutineId = 'routineId';
   static const columnSetsReps = 'setsReps';
   static const columnRestTime = 'restTime';
-  static const columnWeight = 'weight'; // Nuevo campo
-  static const columnNotes = 'notes'; // Nuevo campo
+  static const columnWeight = 'weight';
+  static const columnNotes = 'notes';
 
   final Database database;
 
@@ -36,7 +36,11 @@ class RoutineRepository {
   }
 
   Future<int> addRoutine(Routine routine) async {
-    return await database.insert(routinesTable, routine.toMap());
+    return await database.insert(
+      routinesTable,
+      routine.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<int> updateRoutine(Routine routine) async {
@@ -116,18 +120,18 @@ class RoutineRepository {
 
   Future<int> updateExerciseWithData({
     required int exerciseId,
-    double? weight,
-    String? notes,
+    String? name,
     String? setsReps,
     String? restTime,
+    double? weight,
+    String? notes,
   }) async {
     final data = <String, dynamic>{};
-    if (weight != null) data[columnWeight] = weight;
-    if (notes != null) data[columnNotes] = notes;
+    if (name != null) data[columnName] = name;
     if (setsReps != null) data[columnSetsReps] = setsReps;
     if (restTime != null) data[columnRestTime] = restTime;
-
-    if (data.isEmpty) return 0;
+    if (weight != null) data[columnWeight] = weight;
+    if (notes != null) data[columnNotes] = notes;
 
     return await database.update(
       exercisesTable,

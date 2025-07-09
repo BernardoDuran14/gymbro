@@ -7,6 +7,7 @@ class PR {
   final bool verified;
   final String? notes;
   final String? videoUrl;
+  final bool synced;
 
   PR({
     this.id,
@@ -17,6 +18,7 @@ class PR {
     this.verified = false,
     this.notes,
     this.videoUrl,
+    this.synced = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class PR {
       'verified': verified ? 1 : 0,
       'notes': notes,
       'videoUrl': videoUrl,
+      'synced': synced ? 1 : 0,
     };
   }
 
@@ -42,6 +45,7 @@ class PR {
       verified: map['verified'] == 1,
       notes: map['notes'],
       videoUrl: map['videoUrl'],
+      synced: map['synced'] == 1,
     );
   }
 
@@ -54,6 +58,7 @@ class PR {
     bool? verified,
     String? notes,
     String? videoUrl,
+    bool? synced,
   }) {
     return PR(
       id: id ?? this.id,
@@ -64,6 +69,7 @@ class PR {
       verified: verified ?? this.verified,
       notes: notes ?? this.notes,
       videoUrl: videoUrl ?? this.videoUrl,
+      synced: synced ?? this.synced,
     );
   }
 }

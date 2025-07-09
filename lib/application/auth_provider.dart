@@ -23,10 +23,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     _errorTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
-        state = AuthState(
-          user: state.user,
-          isLoading: state.isLoading,
-        ); // Mantén otros estados pero limpia el error
+        state = AuthState(user: state.user, isLoading: state.isLoading);
       }
     });
   }

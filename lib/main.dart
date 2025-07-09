@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymbro/application/auth_provider.dart';
 import 'package:gymbro/application/database_provider.dart';
+import 'package:gymbro/application/firestore_provider.dart';
 import 'package:gymbro/data/repositories/routine_repository.dart';
 import 'package:gymbro/presentation/screens/auth_screen.dart';
 import 'package:gymbro/presentation/screens/home_screen.dart';
@@ -13,13 +15,16 @@ import 'package:sqflite/sqflite.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inicializar Firebase
+  // Inicializar Firebase
   await Firebase.initializeApp();
 
-  // 2. Inicializar SQLite
+  // Configuración de Firestore
+  _configureFirestore();
+
+  // Inicializar base de datos local
   final database = await openDatabase(
     'gymbro.db',
-    version: 1,
+    version: 2,
     onCreate: (db, version) async {
       // Tabla de rutinas
       await db.execute('''
@@ -42,8 +47,8 @@ void main() async {
           weight REAL,
           notes TEXT,
           FOREIGN KEY (routineId) REFERENCES routines (id)
-  )
-''');
+        )
+      ''');
 
       // Tabla de PRs
       await db.execute('''
@@ -55,53 +60,34 @@ void main() async {
           userEmail TEXT NOT NULL,
           verified INTEGER DEFAULT 0,
           notes TEXT,
-          videoUrl TEXT
+          videoUrl TEXT,
+          synced INTEGER DEFAULT 0
         )
       ''');
-
-      // Insertar datos iniciales
-      await _insertInitialData(db);
+    },
+    onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 2) {
+        await db.execute('ALTER TABLE prs ADD COLUMN synced INTEGER DEFAULT 0');
+      }
     },
   );
 
   runApp(
     ProviderScope(
-      overrides: [
-        // Cambiamos a overrideWithValue para el Database directamente
-        databaseProvider.overrideWith((ref) => database),
-      ],
+      overrides: [databaseProvider.overrideWith((ref) => database)],
       child: const MyApp(),
     ),
   );
 }
 
-Future<void> _insertInitialData(Database db) async {
-  // Insertar rutinas predefinidas
-  final routines = [
-    {
-      'name': 'Push Pull Legs',
-      'level': 'Principiante',
-      'description': 'Rutina dividida en días de empuje, jalón y piernas',
-    },
-    {
-      'name': 'Arnold Split',
-      'level': 'Intermedio',
-      'description': 'Rutina clásica de Arnold Schwarzenegger',
-    },
-  ];
-
-  for (final routine in routines) {
-    final routineId = await db.insert('routines', routine);
-
-    // Insertar ejercicios para cada rutina
-    if (routine['name'] == 'Push Pull Legs') {
-      await db.insert('exercises', {
-        'routineId': routineId,
-        'name': 'Press de banca',
-        'setsReps': '4x8-12',
-        'restTime': '90 seg',
-      });
-    }
+void _configureFirestore() {
+  try {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+  } catch (e) {
+    print('Error configurando Firestore: $e');
   }
 }
 
